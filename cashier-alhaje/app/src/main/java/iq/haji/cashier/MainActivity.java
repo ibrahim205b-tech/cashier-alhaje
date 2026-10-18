@@ -1,4 +1,4 @@
-
+import android.app.role.RoleManager;
 package iq.haji.cashier;
 
 import android.Manifest;
