@@ -128,29 +128,32 @@ public class MainActivity extends Activity {
 
         loadData();
         showLogin();
-
-        requestCallScreeningRole();
-        requestBluetoothPermissionIfNeeded();
-
-        if (Build.VERSION.SDK_INT >= 33 &&
-                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-            requestPermissions(
-                    new String[]{
-                            Manifest.permission.POST_NOTIFICATIONS
-                    },
-                    71
-            );
-        }
+private void requestCallScreeningRole() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        return;
     }
 
-    private int dp(float v) {
-        return (int) (
-                v * getResources().getDisplayMetrics().density + 0.5f
-        );
+    RoleManager roleManager =
+            (RoleManager) getSystemService(Context.ROLE_SERVICE);
+
+    if (roleManager == null) {
+        return;
     }
 
+    if (!roleManager.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING)) {
+        return;
+    }
+
+    if (roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
+        return;
+    }
+
+    Intent intent = roleManager.createRequestRoleIntent(
+            RoleManager.ROLE_CALL_SCREENING
+    );
+
+    startActivityForResult(intent, 1001);
+}
     private TextView text(
             String s,
             int size,
